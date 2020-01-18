@@ -111,7 +111,7 @@ paint_rectangle:
     fill_line:                            // Fill a single row of the rectangle with colour.
       str     w4, [x10], 4                // Colour current point, and update x10 to next point.
       sub     w13, w13, 1                 // Decrease horizontal pixel counter.
-      cbnz    w9, fill_line               // Repeat until line complete.
+      cbnz    w13, fill_line              // Repeat until line complete.
     add     w10, w12, w11                 // x10 = start of current line + pitch = start of new line.
     sub     w3, w3, 1                     // Decrease vertical pixel counter.
     cbnz    w3, fill_rectangle            // Repeat until all framebuffer lines complete.
