@@ -25,6 +25,7 @@ _start:
   mov     sp, STACK
   mov     x29, 0
   adr     x28, sysvars
+  bl      uart_init
   bl      init_framebuffer
   ldr     w0, [x28, bordercolour-sysvars]
   bl      paint_border
@@ -33,7 +34,7 @@ _start:
   b       sleep_core
 
 init_framebuffer:
-  stp     x29, x30, [sp, #-0x10]!         // Push frame pointer, procedure link register on stack.
+  stp     x29, x30, [sp, #-16]!           // Push frame pointer, procedure link register on stack.
   mov     x29, sp                         // Update frame pointer to new stack location.
   movl     w9, MAILBOX_BASE               // x9 = 0x3f00b880 (Mailbox Peripheral Address)
   1:                                      // Wait for mailbox FULL flag to be clear.
@@ -52,7 +53,7 @@ init_framebuffer:
   ldr     w11, [x10, framebuffer-mbreq]   // w11 = allocated framebuffer address
   and     w11, w11, #0x3fffffff           // Clear upper bits beyond addressable memory
   str     w11, [x10, framebuffer-mbreq]   // Store framebuffer address in framebuffer system variable.
-  ldp     x29, x30, [sp], #0x10           // Pop frame pointer, procedure link register off stack.
+  ldp     x29, x30, [sp], #16             // Pop frame pointer, procedure link register off stack.
   ret
 
 # Inputs:
