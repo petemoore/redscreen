@@ -33,9 +33,9 @@ _start:
   bl      init_framebuffer
   ldr     w0, [x28, bordercolour-sysvars]
   bl      paint_border
-  ldr     w0, [x28, windowcolour-sysvars]
+  ldr     w0, [x28, papercolour-sysvars]
   bl      paint_window
-#  bl      paint_copyright
+  bl      paint_copyright
   b       sleep_core
 
 init_framebuffer:
@@ -108,9 +108,7 @@ paint_rectangle:
   adr     x9, mbreq                       // x9 = address of mailbox request.
   ldr     w10, [x9, framebuffer-mbreq]    // w10 = address of framebuffer
   ldr     w11, [x9, pitch-mbreq]          // w11 = pitch
-#  umaddl  x10, w1, w11, x10               // x10 = address of framebuffer + y*pitch
-   mul     w12, w1, w11                    // w12 = y*pitch
-   add     w10, w10, w12                   // w10 = address of framebuffer + y*pitch
+  umaddl  x10, w1, w11, x10               // x10 = address of framebuffer + y*pitch
   add     w10, w10, w0, LSL #2            // w10 = address of framebuffer + y*pitch + x*4
   fill_rectangle:                         // Fills entire rectangle
     mov w12, w10                          // w12 = reference to start of line
@@ -175,7 +173,8 @@ paint_string:
       cbnz    w12, paint_line             // Repeat until line complete.
     add     w14, w16, w9                  // x14 = start of current line + pitch = start of new line.
     sub     w15, w15, 1                   // Decrease vertical pixel counter.
-    cbnz    w3, paint_char                // Repeat until all framebuffer lines complete.
+    cbnz    w15, paint_char                // Repeat until all framebuffer lines complete.
+  add w1, w1, 1                           // bump x
   b 1b
 2:
   ldp     x29, x30, [sp], #0x10           // Pop frame pointer, procedure link register off stack.
@@ -185,10 +184,10 @@ paint_copyright:
   stp     x29, x30, [sp, #-16]!           // Push frame pointer, procedure link register on stack.
   mov     x29, sp                         // Update frame pointer to new stack location.
   adr x0, msg_copyright
-  mov x1, 1
-  mov x2, 2
-  mov x3, 0x0000cfcf
-  mov x4, 0x0000cf00
+  mov w1, 38
+  mov w2, 40
+  ldr w3, [x28, inkcolour-sysvars]
+  ldr w4, [x28, papercolour-sysvars]
   bl paint_string
   ldp     x29, x30, [sp], #0x10           // Pop frame pointer, procedure link register off stack.
   ret
@@ -243,7 +242,8 @@ pitch:
 
 sysvars:
   bordercolour: .word 0x00cf0000
-  windowcolour: .word 0x00cfcfcf
+  papercolour:  .word 0x00cfcfcf
+  inkcolour:    .word 0x00000000
 
 msg_copyright:
    .asciz "1982, 1986, 1987 Amstrad Plc."
