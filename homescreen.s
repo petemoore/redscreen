@@ -50,10 +50,10 @@ init_framebuffer:
   orr     w11, w10, w11                   // w11 = encoded request address + channel number.
   str     w11, [x9, MAILBOX_WRITE]        // Write request address / channel number to mailbox write register.
   2:                                      // Wait for mailbox EMPTY flag to be clear.
-    ldr     w11, [x9, MAILBOX_STATUS]     // w11 = mailbox status.
-    tbnz    w11, MAILBOX_EMPTY, 2b        // If EMPTY flag set (bit 30), try again...
-  ldr     w11, [x9, MAILBOX_REQ_ADDR]     // w11 = message request address + channel number.
-  cmp     w10, w11                        // See if the message is for us.
+    ldr     w12, [x9, MAILBOX_STATUS]     // w12 = mailbox status.
+    tbnz    w12, MAILBOX_EMPTY, 2b        // If EMPTY flag set (bit 30), try again...
+  ldr     w12, [x9, MAILBOX_REQ_ADDR]     // w12 = message request address + channel number.
+  cmp     w11, w12                        // See if the message is for us.
   b.ne    2b                              // If not, try again.
   ldr     w11, [x10, framebuffer-mbreq]   // w11 = allocated framebuffer address
   and     w11, w11, #0x3fffffff           // Clear upper bits beyond addressable memory
