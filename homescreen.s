@@ -45,10 +45,10 @@ init_framebuffer:
   orr     w11, w10, w11                   // w11 = encoded request address + channel number.
   str     w11, [x9, MAILBOX_WRITE]        // Write request address / channel number to mailbox write register.
   2:                                      // Wait for mailbox EMPTY flag to be clear.
-    ldr     w11, [x9, MAILBOX_STATUS]     // w11 = mailbox status.
-    tbnz    w11, MAILBOX_EMPTY, 2b        // If EMPTY flag set (bit 30), try again...
-  ldr     w11, [x9, MAILBOX_REQ_ADDR]     // w11 = message request address + channel number.
-  cmp     w10, w11                        // See if the message is for us.
+    ldr     w12, [x9, MAILBOX_STATUS]     // w12 = mailbox status.
+    tbnz    w12, MAILBOX_EMPTY, 2b        // If EMPTY flag set (bit 30), try again...
+  ldr     w12, [x9, MAILBOX_REQ_ADDR]     // w12 = message request address + channel number.
+  cmp     w11, w12                        // See if the message is for us.
   b.ne    2b                              // If not, try again.
   ldr     w11, [x10, framebuffer-mbreq]   // w11 = allocated framebuffer address
   and     w11, w11, #0x3fffffff           // Clear upper bits beyond addressable memory
@@ -59,9 +59,9 @@ init_framebuffer:
 # Inputs:
 #   w0 = colour to paint border
 paint_border:
-  stp     x29, x30, [sp, #-0x10]!         // Push frame pointer, procedure link register on stack.
+  stp     x29, x30, [sp, #-16]!         // Push frame pointer, procedure link register on stack.
   mov     x29, sp                         // Update frame pointer to new stack location.
-  stp     x19, x20, [sp, #-0x10]!
+  stp     x19, x20, [sp, #-16]!
   mov     w19, w0
   mov     w0, 0
   mov     w1, 0
@@ -98,7 +98,7 @@ paint_border:
 #   w3 = height (pixels)
 #   w4 = colour
 paint_rectangle:
-  stp     x29, x30, [sp, #-0x10]!         // Push frame pointer, procedure link register on stack.
+  stp     x29, x30, [sp, #-16]!         // Push frame pointer, procedure link register on stack.
   mov     x29, sp                         // Update frame pointer to new stack location.
   adr     x9, mbreq                       // x9 = address of mailbox request.
   ldr     w10, [x9, framebuffer-mbreq]    // w10 = address of framebuffer
@@ -122,7 +122,7 @@ paint_rectangle:
 # Inputs:
 #   w0 = colour to paint border
 paint_window:
-  stp     x29, x30, [sp, #-0x10]!         // Push frame pointer, procedure link register on stack.
+  stp     x29, x30, [sp, #-16]!         // Push frame pointer, procedure link register on stack.
   mov     x29, sp                         // Update frame pointer to new stack location.
   mov     w4, w0
   mov     w0, 96
