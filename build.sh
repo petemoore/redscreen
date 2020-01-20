@@ -4,10 +4,11 @@ cd "$(dirname "${0}")"
 rm -rf dist
 mkdir dist
 aarch64-unknown-linux-gnu-as -g -o homescreen.o homescreen.s 
+aarch64-unknown-linux-gnu-as -g -o font.o font.s 
 aarch64-unknown-linux-gnu-as -g -o uart.o uart.s 
 aarch64-unknown-linux-gnu-as -g -o delays.o delays.s 
 aarch64-unknown-linux-gnu-as -g -o mbox.o mbox.s 
-aarch64-unknown-linux-gnu-ld -M -o homescreen.elf homescreen.o uart.o delays.o mbox.o
+aarch64-unknown-linux-gnu-ld -M -o homescreen.elf homescreen.o font.o uart.o delays.o mbox.o
 aarch64-unknown-linux-gnu-objcopy --set-start=0x80000 homescreen.elf -O binary dist/kernel8.img
 aarch64-unknown-linux-gnu-objdump -b binary -z --adjust-vma=0x80000 -maarch64 -D dist/kernel8.img
 rm homescreen.{o,elf} {mbox,uart,delays}.o
